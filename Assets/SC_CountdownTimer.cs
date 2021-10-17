@@ -8,11 +8,11 @@ public class SC_CountdownTimer : MonoBehaviour
     public enum CountdownFormatting { DaysHoursMinutesSeconds, HoursMinutesSeconds, MinutesSeconds, Seconds };
     public CountdownFormatting countdownFormatting = CountdownFormatting.MinutesSeconds; //Controls the way the timer string will be formatted
     public bool showMilliseconds = true; //Whether to show milliseconds in countdown formatting
-    public static double countdownTime = 10; //Countdown time in seconds
+    public static float countdownTime = 20; //Countdown time in seconds
 
-    Text countdownText;
-    double countdownInternal;
-    bool countdownOver = false;
+    public static Text countdownText;
+    public static float countdownInternal;
+    public static bool countdownOver = false;
 
     // Start is called before the first frame update
     void Start()
@@ -40,6 +40,7 @@ public class SC_CountdownTimer : MonoBehaviour
             if (!countdownOver)
             {
                 countdownOver = true;
+				Rounds.over = true;
 
                 Debug.Log("Countdown has finished running...");
 
