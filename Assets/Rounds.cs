@@ -1,8 +1,19 @@
 //Main chunk of code for game
 //Changes to be made:
-//add start screen and start button
-//add reset button
+//add changes to judges faces when you get an answer wrong
+//add changes to screen to show loss of points and/or flash red/green when right or wrong
+//add start screen and start button and restart button and instructions
+//possibly add distractions
+//make ai more presentable
+//experiment to give players more time (probably different reduction equation)
+//
+//bugs:
 //skips round 9
+//location of text is wak
+//html thingy is stupid
+//maybe: unsure if answers are correctly being chosen
+//weird warnings in the console I don't care much about
+//first round is occasionally weird with text
 
 
 
@@ -16,13 +27,16 @@ using UnityEngine.UI;
 public class Rounds : MonoBehaviour
 {
 	public int rounds;
+	//static means it can be accessed in other scripts
 	public static float choice;
 	public static int question;
 	public static bool over;
 	Text output;
 	float interval;
 	bool end;
-	
+
+//array of potential questions: order matters	
+//see line 123 if you add questions
 string[] q = {
 "How do you do in front of the camera?", 
 "What is your approach to acting in general?", 
@@ -42,7 +56,7 @@ string[] q = {
 "How do you research and approach a new role?",
 "Your character may have a foreign accent.  How experienced are you in imitating foreign accents?"
 };
-
+//array of correct answers: order matters
 string[] yes = {"I do takes consistently well, but am able to take director’s notes!", 
 "I try to get into the headspace of my character, through mental, emotional, and physical methods", 
 "I can be pretty shy between takes, but I treat coworkers with respect and get my job done well",
@@ -62,7 +76,7 @@ string[] yes = {"I do takes consistently well, but am able to take director’s 
 "If this character was a real person, I typically do some online research about their history.  If the character is fictitious, I read the script more than once, attempting to internalize their personality.  After that, I take a walk to clear my head and put myself in the right mental state for acting.",
 "Accents are something that I have to work very hard at.  After years of work with my accent coach, I have perfected 2 different English accents and 5 different non-English accents."
 };
-
+//array of incorrect answers: order matters
 string[] no = {
 "I get shy in front of cameras and often miss my marks for staging", 
 "I often go off script or improvise based on what I feel I would do in the character’s situation.", 
@@ -91,8 +105,13 @@ string[] no = {
 		initiate();
 		
     }
+	//added to make start/restart much easier
+	//still hella buggy, but not my problem
 	void initiate()
 	{
+		//x.variable means variable in script x
+		//set values to initial condition
+		//some stuff here is useless, but don't delete anything
 		rounds = 10;
 		SC_CountdownTimer.countdownInternal = 20;
 		Score.score = 0;
@@ -101,9 +120,13 @@ string[] no = {
 		output = GetComponent<Text>();
         output.text = "Round: " + rounds.ToString();
 		choice = (Random.value);
+		//change number to # of questions - 1 when questions are added 
+		//one more line that you need to do this to later in the code
 		question = Mathf.RoundToInt(Random.value * 16);
 		Debug.Log(choice + " " + question);
 		over = false;
+		//amount of time that is subtracted after each round
+		//currently linear, maybe try non-linear
 		interval = SC_CountdownTimer.countdownTime / (rounds);
 		MainText.output.text = "";
 		newRound();
@@ -113,12 +136,13 @@ string[] no = {
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(choice);
+		//used to call game over
 		if (rounds == 0)
 		{
 			endstate();
 			return;
 		}
+		//used to indicate selection of score, add/subtract points, and move to next round
 		if (Input.GetKeyDown(KeyCode.LeftArrow))
 		{
 			if (choice > .5)
@@ -128,7 +152,6 @@ string[] no = {
 				updateScore(-1);
 			}
 			newRound();
-			Debug.Log("a");
 		}
 		if (Input.GetKeyDown(KeyCode.RightArrow))
 		{
@@ -139,14 +162,16 @@ string[] no = {
 				updateScore(2);
 			}
 			newRound();
-			Debug.Log("a");
 		}
+		//do not know what the hell this is for, but don't delete
 		if (over)
 		{
 			SC_CountdownTimer.countdownOver = false;
 			Debug.Log("over");
 		}
     }
+	//initiates a new round
+	//called after each button press
 	void newRound()
 	{
 		
@@ -156,7 +181,8 @@ string[] no = {
 		pickText();
 		Score.output.text = "Score: " + Score.score.ToString();
 		output.text = "Round: " + rounds.ToString();
-		
+		//sets new time with subtracted interval
+		//90% sure there is a bug here, will look into it
 		if (SC_CountdownTimer.countdownOver == false) {
 			SC_CountdownTimer.countdownTime -= interval;
 			SC_CountdownTimer.countdownInternal = SC_CountdownTimer.countdownTime;
@@ -166,6 +192,7 @@ string[] no = {
 		}
 		
 	}
+	//places right/wrong answer on certain sides of the screen
 	void pickText()
 	{
 		Question.output.text = q[question];
@@ -178,11 +205,12 @@ string[] no = {
 			ChoiceA.output.text = no[Rounds.question];
 		}
 	}
+	//don't touch
 	void updateScore(int mult)
 	{
 		Score.score += mult*100*Mathf.RoundToInt(SC_CountdownTimer.countdownInternal) / Mathf.RoundToInt(SC_CountdownTimer.countdownTime);
-		Debug.Log(Score.score);
 	}
+	//game over screen
 	void endstate()
 	{
 		Question.output.text = " ";
