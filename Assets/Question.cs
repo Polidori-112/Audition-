@@ -20,13 +20,13 @@ public class Question : MonoBehaviour
     void Start()
     {
         output = GetComponent<Text>();
-		pickText();
+		//pickText();
     }
 	
     // Update is called once per frame
     public void pickText()
 	{
-		output.text = q[Rounds.question];
+		output.text = "";
 	}
 	void update()
 	{

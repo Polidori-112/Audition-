@@ -28,9 +28,9 @@ public class ChoiceA : MonoBehaviour
 		
 		if (Rounds.choice <= .5)
 		{
-			output.text = no[Rounds.question];
+			output.text = "";
 		} else {
-			output.text = yes[Rounds.question];
+			output.text = "";
 		}
 	}
 	void update()

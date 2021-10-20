@@ -33,7 +33,8 @@ public class Rounds : MonoBehaviour
 	public static bool over;
 	Text output;
 	float interval;
-	bool end;
+	bool start;
+	bool restart;
 
 //array of potential questions: order matters	
 //see line 123 if you add questions
@@ -102,28 +103,25 @@ string[] no = {
     // Start is called before the first frame update
     void Start()
     {
-		initiate();
-		
+		start = false;
+		MainText.output.text = "Press an arrow key to start";
+		rounds = 10;
+		restart = false;
     }
 	//added to make start/restart much easier
-	//still hella buggy, but not my problem
 	void initiate()
 	{
 		//x.variable means variable in script x
 		//set values to initial condition
 		//some stuff here is useless, but don't delete anything
-		rounds = 10;
 		SC_CountdownTimer.countdownInternal = 20;
+		SC_CountdownTimer.countdownTime = SC_CountdownTimer.countdownInternal;
 		Score.score = 0;
-		end = false;
 		SC_CountdownTimer.countdownOver = false;
 		output = GetComponent<Text>();
         output.text = "Round: " + rounds.ToString();
-		choice = (Random.value);
-		//change number to # of questions - 1 when questions are added 
-		//one more line that you need to do this to later in the code
-		question = Mathf.RoundToInt(Random.value * 16);
-		Debug.Log(choice + " " + question);
+		rounds = 10;
+		rounds = rounds + 1;
 		over = false;
 		//amount of time that is subtracted after each round
 		//currently linear, maybe try non-linear
@@ -137,14 +135,25 @@ string[] no = {
     void Update()
     {
 		//used to call game over
+		//if left arrow pressed, game will restart
 		if (rounds == 0)
 		{
 			endstate();
+			if (Input.GetKeyDown(KeyCode.LeftArrow))
+			{
+				initiate();
+			}
 			return;
 		}
 		//used to indicate selection of score, add/subtract points, and move to next round
 		if (Input.GetKeyDown(KeyCode.LeftArrow))
 		{
+			if (!start)
+			{
+				initiate();
+				start = true;
+				return;
+			}
 			if (choice > .5)
 			{
 				updateScore(2);
@@ -155,6 +164,12 @@ string[] no = {
 		}
 		if (Input.GetKeyDown(KeyCode.RightArrow))
 		{
+			if (!start)
+			{
+				initiate();
+				start = true;
+				return;
+			}
 			if (choice > .5)
 			{
 				updateScore(-1);
@@ -176,8 +191,7 @@ string[] no = {
 	{
 		
 		rounds = rounds - 1;
-		choice = (Random.value);
-		question = Mathf.RoundToInt(Random.value * 16);
+		MainText.output.text = "";
 		pickText();
 		Score.output.text = "Score: " + Score.score.ToString();
 		output.text = "Round: " + rounds.ToString();
@@ -195,6 +209,8 @@ string[] no = {
 	//places right/wrong answer on certain sides of the screen
 	void pickText()
 	{
+		choice = (Random.value);
+		question = Mathf.RoundToInt(Random.value * 16);
 		Question.output.text = q[question];
 		if (choice > .5)
 		{
@@ -219,7 +235,8 @@ string[] no = {
 		Score.output.text = "";
 		SC_CountdownTimer.countdownInternal = 0f;
 		MainText.output.text = "Game Over: " + Score.score + " points";
-		end = true;
+		start = false;
+		restart = true;
 	}
 
 }
