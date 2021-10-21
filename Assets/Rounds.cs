@@ -31,22 +31,23 @@ public class Rounds : MonoBehaviour
 	public static float choice;
 	public static int question;
 	public static bool over;
-	Text output;
+	Text roundNum;
 	float interval;
 	bool start;
 	bool restart;
+    bool won;
 
-//array of potential questions: order matters	
+//array of potential questions: order matters
 //see line 123 if you add questions
 string[] q = {
-"How do you do in front of the camera?", 
-"What is your approach to acting in general?", 
-"How do you work with other actors, as well as crew and directors?", 
-"How do you feel about being included in promotional materials?", 
-"How would you describe your work ethic?", 
-"Do you know how to sing?", 
-"How many languages can you speak?  Your character may need to speak non-English languages.", 
-"How athletic/healthy is your lifestyle?  We want our actors as physically fit as possible.", 
+"How do you do in front of the camera?",
+"What is your approach to acting in general?",
+"How do you work with other actors, as well as crew and directors?",
+"How do you feel about being included in promotional materials?",
+"How would you describe your work ethic?",
+"Do you know how to sing?",
+"How many languages can you speak?  Your character may need to speak non-English languages.",
+"How athletic/healthy is your lifestyle?  We want our actors as physically fit as possible.",
 "You may need to dance for your role.  How experienced are you at dancing?",
 "What is your favorite part of acting?",
 "How long have you been acting for?",
@@ -58,14 +59,14 @@ string[] q = {
 "Your character may have a foreign accent.  How experienced are you in imitating foreign accents?"
 };
 //array of correct answers: order matters
-string[] yes = {"I do takes consistently well, but am able to take director’s notes!", 
-"I try to get into the headspace of my character, through mental, emotional, and physical methods", 
+string[] yes = {"I do takes consistently well, but am able to take director’s notes!",
+"I try to get into the headspace of my character, through mental, emotional, and physical methods",
 "I can be pretty shy between takes, but I treat coworkers with respect and get my job done well",
 "Anything goes, no matter how I’m portrayed!",
-"I work hard and always show up to work on time.  Whenever I am on set, I am giving 100% effort.  I only call off work when there’s an emergency.", 
-"No, I cannot sing.  I am eager to learn how and am willing to spend my free time practicing.", 
-"I am fluent in English and can speak a little bit of German.", 
-"Every morning, I manage to find time to go for a good run.", 
+"I work hard and always show up to work on time.  Whenever I am on set, I am giving 100% effort.  I only call off work when there’s an emergency.",
+"No, I cannot sing.  I am eager to learn how and am willing to spend my free time practicing.",
+"I am fluent in English and can speak a little bit of German.",
+"Every morning, I manage to find time to go for a good run.",
 "I have been dancing since I was 8 years old.  I took a break for several years during university, but now I have been practicing again.",
 "I really enjoy the freedom that comes with acting.  I can be whomever I want to be, as long as there’s a role for it.  The escape from reality has fascinated me… ever since I was a young child.",
 "I hope to continuously improve my acting career.  Over the next 5 years, I want to gain as much acting experience and knowledge as possible.  While I may not become the most famous actor, I want to have a very successful career in this field.",
@@ -79,14 +80,14 @@ string[] yes = {"I do takes consistently well, but am able to take director’s 
 };
 //array of incorrect answers: order matters
 string[] no = {
-"I get shy in front of cameras and often miss my marks for staging", 
-"I often go off script or improvise based on what I feel I would do in the character’s situation.", 
+"I get shy in front of cameras and often miss my marks for staging",
+"I often go off script or improvise based on what I feel I would do in the character’s situation.",
 "I’m very outgoing and sociable, but shoots take longer as its harder to get me refocused after we cut",
-"I won’t do it unless I discuss with my lawyer!", 
-"I work hard!  Typically, I’m only a few minutes late to work.  I may require more breaks than my co-workers, but I do put in effort during the work day.", 
-"Yes, I can sing.  I am a sub-par singer and have little passion for music.", 
-"I am fluent in English and can fluently understand Spanish and Chinese.", 
-"I exercise for 30 minutes every day.  I run around the neighborhood, do push ups, and lift weights.  After every workout, I consume a fast food meal fit for three people.  Who knows why I keep gaining weight…", 
+"I won’t do it unless I discuss with my lawyer!",
+"I work hard!  Typically, I’m only a few minutes late to work.  I may require more breaks than my co-workers, but I do put in effort during the work day.",
+"Yes, I can sing.  I am a sub-par singer and have little passion for music.",
+"I am fluent in English and can fluently understand Spanish and Chinese.",
+"I exercise for 30 minutes every day.  I run around the neighborhood, do push ups, and lift weights.  After every workout, I consume a fast food meal fit for three people.  Who knows why I keep gaining weight…",
 "I really love dancing, and I have been practicing for the last year.  I am a rather casual dancer and my skills are far from professional level.",
 "Acting is the only thing that I have ever been good at.  How else will I pay the bills?",
 "I have been acting all of my life.  It is something that I enjoy, and have been enjoying ever since I could remember.  However, I also have been doing other activities like animation and music production on the side.  I like acting, but in 5 years I may move on with my career.",
@@ -104,9 +105,14 @@ string[] no = {
     void Start()
     {
 		start = false;
-		MainText.output.text = "Press an arrow key to start";
+		MainText.output.text = "Press the left or right arrow key to start";
 		rounds = 10;
 		restart = false;
+        SC_CountdownTimer.countdownInternal = 20;
+		SC_CountdownTimer.countdownTime = SC_CountdownTimer.countdownInternal;
+        roundNum = GetComponent<Text>();
+        roundNum.text = "Round: " + rounds.ToString();
+        won = false;
     }
 	//added to make start/restart much easier
 	void initiate()
@@ -118,8 +124,8 @@ string[] no = {
 		SC_CountdownTimer.countdownTime = SC_CountdownTimer.countdownInternal;
 		Score.score = 0;
 		SC_CountdownTimer.countdownOver = false;
-		output = GetComponent<Text>();
-        output.text = "Round: " + rounds.ToString();
+		roundNum = GetComponent<Text>();
+        roundNum.text = "Round: " + rounds.ToString();
 		rounds = 10;
 		rounds = rounds + 1;
 		over = false;
@@ -189,12 +195,13 @@ string[] no = {
 	//called after each button press
 	void newRound()
 	{
-		
+
 		rounds = rounds - 1;
 		MainText.output.text = "";
 		pickText();
 		Score.output.text = "Score: " + Score.score.ToString();
-		output.text = "Round: " + rounds.ToString();
+		roundNum.text = "Round: " + rounds.ToString();
+        
 		//sets new time with subtracted interval
 		//90% sure there is a bug here, will look into it
 		if (SC_CountdownTimer.countdownOver == false) {
@@ -204,7 +211,7 @@ string[] no = {
 				SC_CountdownTimer.countdownInternal = 0.01f;
 			}
 		}
-		
+
 	}
 	//places right/wrong answer on certain sides of the screen
 	void pickText()
@@ -224,19 +231,35 @@ string[] no = {
 	//don't touch
 	void updateScore(int mult)
 	{
-		Score.score += mult*100*Mathf.RoundToInt(SC_CountdownTimer.countdownInternal) / Mathf.RoundToInt(SC_CountdownTimer.countdownTime);
+		Score.score += mult*100*Mathf.RoundToInt(SC_CountdownTimer.countdownInternal)
+                    / Mathf.RoundToInt(SC_CountdownTimer.countdownTime);
+        if (Score.score > 800) {
+            won = true;
+            rounds = 1;
+        }
 	}
 	//game over screen
 	void endstate()
 	{
-		Question.output.text = " ";
-		ChoiceA.output.text = "";
-		ChoiceB.output.text = "";
-		Score.output.text = "";
-		SC_CountdownTimer.countdownInternal = 0f;
-		MainText.output.text = "Game Over: " + Score.score + " points";
-		start = false;
-		restart = true;
+        if (won) {
+            Question.output.text = "";
+    		ChoiceA.output.text = "";
+    		ChoiceB.output.text = "";
+    		Score.output.text = "";
+    		SC_CountdownTimer.countdownInternal = 0f;
+    		MainText.output.text = "You Win!";
+    		start = false;
+    		restart = true;
+        } else {
+            Question.output.text = "";
+    		ChoiceA.output.text = "";
+    		ChoiceB.output.text = "";
+    		Score.output.text = "";
+    		SC_CountdownTimer.countdownInternal = 0f;
+    		MainText.output.text = "Game Over: " + Score.score + " points";
+    		start = false;
+    		restart = true;
+        }
 	}
 
 }

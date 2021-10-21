@@ -14,15 +14,29 @@ public class SC_CountdownTimer : MonoBehaviour
     public static Text countdownText;
     public static float countdownInternal;
     public static bool countdownOver = false;
+    public static bool timerRunning = false;
 
     // Start is called before the first frame update
     void Start()
     {
         countdownText = GetComponent<Text>();
+        countdownText.text = FormatTime(countdownInternal, countdownFormatting,
+                                                      showMilliseconds);
         countdownInternal = countdownTime; //Initialize countdown
+        FormatTime(20, countdownFormatting, showMilliseconds);
     }
 
-    void FixedUpdate()
+    void FixedUpdate() {
+        if ((Input.GetKeyDown(KeyCode.LeftArrow)) ||
+           (Input.GetKeyDown(KeyCode.RightArrow)) ||
+           timerRunning == true) {
+               timerRunning = true;
+               runTimer();
+           }
+    }
+
+
+    void runTimer()
     {
         if (countdownInternal > 0)
         {
@@ -34,7 +48,9 @@ public class SC_CountdownTimer : MonoBehaviour
                 countdownInternal = 0;
             }
 
-            countdownText.text = FormatTime(countdownInternal, countdownFormatting, showMilliseconds);
+            countdownText.text = FormatTime(countdownInternal,
+                                            countdownFormatting,
+                                            showMilliseconds);
         }
         else
         {
