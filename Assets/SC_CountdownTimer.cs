@@ -36,6 +36,11 @@ public class SC_CountdownTimer : MonoBehaviour
         {
             countdownInternal -= Time.deltaTime;
 
+            if ((countdownInternal <= 5) && (countdownInternal >= 4))
+            {
+                StartCoroutine(changeBackground(253f, 218f, 13f));
+            }
+
             //Clamp the timer value so it never goes below 0
             if (countdownInternal < 0)
             {
@@ -55,6 +60,15 @@ public class SC_CountdownTimer : MonoBehaviour
                 //Your code here...
             }
         }
+    }
+
+    IEnumerator changeBackground(float x, float y, float z)
+    {
+        Camera.main.GetComponent<Camera>().backgroundColor =
+            new Color(x / 255f, y / 255f, z / 255f);
+        yield return new WaitForSeconds(1.0f);
+        Camera.main.GetComponent<Camera>().backgroundColor =
+            new Color(55f / 255f, 77f / 255f, 118f / 255f);
     }
 
     string FormatTime(double time, CountdownFormatting formatting, bool includeMilliseconds)
